@@ -2,9 +2,15 @@
 # that are needed for the functions you use will be imported, rather than the modules needed for all utilities.
 
 def reduced_chi_sq(model, data, errors):
-    # TODO: copy comments from masses function.
+    """ Does a reduced chi squared calculation
+
+    :param model: list of values that describe a possible fit to the data
+    :param data: list of values that are the data do be fitted
+    :param errors: list of errors on the data
+    :return: value for the chi_squared value of the fit of the model to the data
+    """
     if not len(model) == len(data) == len(errors):
-        raise ValueError("Data, model, and errors all need to have the same length.")
+        raise ValueError("The length of the model, data, and errors need to be the same.")
     chi_sq = 0
     for i in range(len(model)):
         chi_sq += ((model[i] - data[i])/errors[i])**2
