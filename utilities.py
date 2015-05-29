@@ -71,5 +71,25 @@ def percent_flux_errors_to_mag_errors(percent_flux_error):
     :return: magnitude error corresponding to the percentage flux error.
     """
     return (2.5 / 2.30258509299) * percent_flux_error
+# Note: these^ all need to be tested.
 
-# Note: these all need to be tested.
+
+def fl_to_fv(fls, wavelengths):
+    """ Converts flux from fl (flux per wavelength, with units of
+    ergs/s/cm^2/Angstrom) to fv (flux per hertz, with units of ergs/s/cm^2/Hz).
+
+
+
+    :param fls: list of flux per wavelength. Make sure they are in the units
+                specified above.
+    :type fls: list
+    :param wavelengths: list of wavelengths. This must correspond to the
+                        fluxes passed in above.
+    :type wavelengths: list
+    :return: flux per frequency, with the units specified above.
+    :rtype: list
+    """
+    return [10**(-10) * wavelength**2 * fl / (3*(10**8))
+            for wavelength, fl in zip(wavelengths, fls)]
+
+
