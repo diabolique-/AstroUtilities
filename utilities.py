@@ -92,4 +92,27 @@ def fl_to_fv(fls, wavelengths):
     return [10**(-10) * wavelength**2 * fl / (3*(10**8))
             for wavelength, fl in zip(wavelengths, fls)]
 
+def save_as_one_pdf(figs, filename):
+    """
+    Save a bunch of matplotlib figures to one pdf file at once.
+
+    :param figs: list of figures to be saved as PDFs
+    :type figs: list
+    :param filename: place where the PDFs will be saved
+    :type filename: str
+    :return: none
+    """
+    from matplotlib.backends.backend_pdf import PdfPages
+    import matplotlib.pyplot as plt
+
+    # save the objects with a pdfpages object
+    pp = PdfPages(filename)
+    for fig in figs:
+        pp.savefig(fig)
+    pp.close()
+
+    # close the figures, too
+    for fig in figs:
+        plt.close(fig)
+
 
