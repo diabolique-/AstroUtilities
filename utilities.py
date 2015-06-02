@@ -115,4 +115,7 @@ def save_as_one_pdf(figs, filename):
     for fig in figs:
         plt.close(fig)
 
+# TODO: error checking in flux and mag calculations
+# TODO: Vega to AB mags
+
 
