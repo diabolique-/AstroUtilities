@@ -115,6 +115,77 @@ def save_as_one_pdf(figs, filename):
     for fig in figs:
         plt.close(fig)
 
+def abs_path(path):
+    """Makes a given path into an absolute path.
+
+    Works for paths that are already absolute, paths which start with ~/ and
+    . and .. as well as paths that are just a file or folder. All relative
+    paths are assumed to be relative to the current working directory.
+
+    :param path: path to be made absolute
+    :return: string with the absolute path
+    """
+
+    import os
+
+    if path.startswith("/"):
+        # is an absolute path, so we don't need to do anything
+        return path
+    elif path.startswith("~/"):
+        # is relative to home, which is easy.
+        return os.path.expanduser(path)
+    elif path.startswith("../"):  # parent directory
+        above = os.sep.join(os.getcwd().split(os.sep)[0:-1])
+        # The 0:-1 is to get rid of the last path (our current directory),
+        # which will give us the directory above
+        return above + path[2:]  # get rid of ..
+    elif path.startswith("./"):  # current directory
+        return os.getcwd() + path[1:]  # get rid of .
+    elif path[0].isalnum():  # relative to current directory
+        return os.getcwd() + os.sep + path
+    else:
+        raise ValueError("Path format not recognized.")
+
+def get_files_with_extension(parent_directory, extension):
+    """Gets all the files in the parent directory (and its subdirectories)
+    that end with extension.
+
+    :param parent_directory: parent directory to search for catalogs.
+    :param extension: extension of the files that will be returned
+    :return: List of paths to files in parent_directory that end with
+             extension.
+    """
+    catalogs = []
+    for dirpath, dirnames, filenames in os.walk(parent_directory):
+        for filename in filenames:
+            if filename.endswith(extension):
+                catalogs.append(os.path.join(dirpath, filename))
+    return catalogs
+
+def convert_flux(flux, zeropoint1, zeropoint2):
+    """Converts flux from one unit to another.
+
+    The flux units must be f_nu units, like Janskys. The zeropoints passed
+    in are the conversion to AB mags.
+
+    Math behind this:
+    -2.5 log(f1) + zp1 = -2.5 log(f2) + zp2   # mag will be the same
+    log(f2) = log(f1) + (zp2 - zp1)/2.5
+    f2 = f1 * 10^((zp2 - zp1)/2.5)
+
+    :param flux: flux to be converted
+    :param zeropoint1: zeropoint of the AB magnitude system for the units of
+                       of the flux being passed in.
+    :param zeropoint2: zeropoint of the AB magnitude system for the units of
+                       the result.
+    Some common zeropoints:
+        uJ: 23.9
+        maggies: 0
+    :return: flux in the units corresponding to zeropoint2
+    """
+    import math
+    return flux * 10**((zeropoint2 - zeropoint1)/2.5)
+
 # TODO: error checking in flux and mag calculations
 # TODO: Vega to AB mags
 
