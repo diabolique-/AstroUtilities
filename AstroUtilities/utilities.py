@@ -14,7 +14,7 @@ def reduced_chi_sq(model, data, errors):
     :param model: list of values that describe a possible fit to the data
     :param data: list of values that are the data do be fitted
     :param errors: list of errors on the data
-    :return: value for the chi_squared value of the fit of the model to the data
+    :return: value for the reduced chi squared value of the fit of the model to the data
     """
     if not len(model) == len(data) == len(errors):
         raise ValueError("The length of the model, data, and errors need to be the same.")
@@ -67,7 +67,7 @@ def mag_errors_to_percent_flux_errors(mag_error):
 
         dm = \\frac{-2.5}{\ln(10)} \\frac{dF}{F}
 
-        \\frac{dF}{F} = dm * \\frac{\\ln(10)}{2.5}
+        \\frac{dF}{F} = dm \\frac{\\ln(10)}{2.5}
 
     The minus sign just tells us that increasing flux gives decreasing magnitudes, so we can safely ignore it.
 
