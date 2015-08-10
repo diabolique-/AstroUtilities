@@ -4,6 +4,13 @@
 def reduced_chi_sq(model, data, errors):
     """ Does a reduced chi squared calculation
 
+    .. math::
+        \\chi^2 = \\sum_{k=1}^{n} \\left( \\frac{\\text{model}_k - \\text{data}_k}{\\text{error}_k} \\right) ^2
+
+        \\chi^2_{\\text{red}} = \\frac{\\chi^2}{n}
+
+    where :math:`n` is the number of data points.
+
     :param model: list of values that describe a possible fit to the data
     :param data: list of values that are the data do be fitted
     :param errors: list of errors on the data
@@ -20,12 +27,13 @@ def mag_to_flux(mag, zeropoint):
     """Convert a magnitude into a flux.
 
     We get the conversion by starting with the definition of the magnitude scale.
+
     .. math::
-       m = -2.5 \\log_{10}(F) + C 
+        m = -2.5 \\log_{10}(F) + C 
 
-       2.5 \\log_{10}(F) = C - m
+        2.5 \\log_{10}(F) = C - m
 
-       F = 10^{\\frac{C-m}{2.5}}
+        F = 10^{\\frac{C-m}{2.5}}
 
     :param mag: magnitdue to be converted into a flux.
     :param zeropoint: zeropoint (in mags) of the magnitude system being used
@@ -36,6 +44,9 @@ def mag_to_flux(mag, zeropoint):
 
 def flux_to_mag(flux, zeropoint):
     """Convert flux to magnitude with the given zeropoint.
+
+    .. math::
+        m = -2.5 \\log_{10} (F) + C
 
     :param flux: flux in whatever units. Choose your zeropoint correctly to make this work with the units flux is in.
     :param zeropoint: zeropoint of the system (in mags)
@@ -52,15 +63,15 @@ def mag_errors_to_percent_flux_errors(mag_error):
     """Converts a magnitude error into a percent flux error.
 
     .. math::
-       m = -2.5 \\log_{10} (F) + C
+        m = -2.5 \\log_{10} (F) + C
 
-       dm = \\frac{-2.5}{\ln(10)} \\frac{dF}{F}
+        dm = \\frac{-2.5}{\ln(10)} \\frac{dF}{F}
 
-       \\frac{dF}{F} = dm * frac{\\ln(10)}{2.5}
+        \\frac{dF}{F} = dm * \\frac{\\ln(10)}{2.5}
 
     The minus sign just tells us that increasing flux gives decreasing magnitudes, so we can safely ignore it.
 
-    note: :math`ln(10) = 2.30258509299`
+    note: :math:`ln(10) = 2.30258509299`
     I just plug in the numerical number to avoid importing things to take natural logs.
 
     :param mag_error: magnitude error
@@ -72,11 +83,11 @@ def percent_flux_errors_to_mag_errors(percent_flux_error):
     """Converts a percentage flux error into a magnitude error.
 
     .. math::
-       m = -2.5 \\log_{10} (F) + C
+        m = -2.5 \\log_{10} (F) + C
 
-       dm = \\frac{-2.5}{\ln(10)} \\frac{dF}{F}
+        dm = \\frac{-2.5}{\ln(10)} \\frac{dF}{F}
 
-    note: :math`ln(10) = 2.30258509299`
+    note: :math:`ln(10) = 2.30258509299`
     I just plug in the numerical number to avoid importing things to take natural logs.
 
     :param percent_flux_error: percentage flux error
