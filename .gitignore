@@ -1,3 +1,4 @@
-# Pycharm stuff
-.idea/
-.pyc*
+.idea/*
+*.pyc
+docs/*_
+docs/Makefile
