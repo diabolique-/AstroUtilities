@@ -67,7 +67,7 @@ def mag_errors_to_percent_flux_errors(mag_error):
 
         dm = \\frac{-2.5}{\ln(10)} \\frac{dF}{F}
 
-        \\frac{dF}{F} = dm \\frac{\\ln(10)}{2.5}
+        \\frac{dF}{F} = \\frac{\\ln(10)}{2.5} dm 
 
     The minus sign just tells us that increasing flux gives decreasing magnitudes, so we can safely ignore it.
 
