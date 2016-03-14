@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# AstroUtilities documentation build configuration file, created by
+# astro_utilities documentation build configuration file, created by
 # sphinx-quickstart on Sun Aug  9 19:19:31 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -51,7 +51,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'AstroUtilities'
+project = u'astro_utilities'
 copyright = u'2015, Gillen Brown'
 author = u'Gillen Brown'
 
@@ -205,7 +205,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'AstroUtilitiesdoc'
+htmlhelp_basename = 'astro_utilitiesdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -227,7 +227,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'AstroUtilities.tex', u'AstroUtilities Documentation',
+  (master_doc, 'astro_utilities.tex', u'astro_utilities Documentation',
    u'Gillen Brown', 'manual'),
 ]
 
@@ -257,7 +257,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'astroutilities', u'AstroUtilities Documentation',
+    (master_doc, 'astro_utilities', u'astro_utilities Documentation',
      [author], 1)
 ]
 
@@ -271,8 +271,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'AstroUtilities', u'AstroUtilities Documentation',
-   author, 'AstroUtilities', 'One line description of project.',
+  (master_doc, 'astro_utilities', u'astro_utilities Documentation',
+   author, 'astro_utilities', 'One line description of project.',
    'Miscellaneous'),
 ]
 

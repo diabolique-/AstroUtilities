@@ -95,4 +95,71 @@ def percent_flux_errors_to_mag_errors(percent_flux_error):
     """
     return (2.5 / 2.30258509299) * percent_flux_error
 
+
+def symmetric_match(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
+          dec_col_1="dec", dec_col_2="dec", max_sep=3.0):
+    """
+    Matches objects from two astropy tables by ra/dec.
+
+    This function does symmetric matching. This measns that to be defined as
+    a match, both objects must be each other's closest match. Their separation
+    must also be less than the `max_sep` parameter.
+
+    :param table_1: First astopy table object containing objects with ra/dec
+                    information.
+    :param table_2: First astopy table object containing objects with ra/dec
+                    information.
+    :param ra_col_1: Name of the ra column in table_1. Defaults to "ra".
+    :param ra_col_2: Name of the ra column in table_2. Defaults to "ra".
+    :param dec_col_1: Name of the dec column in table_1. Defaults to "dec".
+    :param dec_col_2: Name of the dec column in table_2. Defaults to "dec".
+    :param max_sep: Maximum separation (in arcseconds) allowed for two objects
+                    to be considered a match.
+    :return: Astropy table object containing the matches between the two
+             input table objects. All columns from both catalogs will be
+             included, as well as a separate separation column.
+    """
+
+    from astropy.coordinates import match_coordinates_sky
+    from astropy import units as u
+
+    coords_1 = coordinates.SkyCoord(table_1[ra_col_1], table_1[dec_col_1],
+                                    unit=u.degree)
+    coords_2 = coordinates.SkyCoord(table_2[ra_col_2], table_2[dec_col_2],
+                                    unit=u.degree)
+
+    # find matches for objects in table 1 in table 2
+    match_idx_12, sep_12, dist_12 = match_coordinates_sky(coords_1, coords_2)
+    # and find matches for objects in table 2 in table 1
+    match_idx_21, sep_21, dist_21 = match_coordinates_sky(coords_2, coords_1)
+
+    # now check that the matching is symmetric
+    symmetric_12 = []
+    for idx_1, match_idx in enumerate(match_idx_12):
+        if idx_1 == match_idx_21[match_idx] and sep_12[idx_1].arcsec < max_sep:
+            symmetric_12.append((idx_1, match_idx, sep_12[idx_1].arcsec))
+
+    idx_1, idx_2, sep = zip(*symmetric_12)
+
+    idx_1 = list(idx_1)
+    idx_2 = list(idx_2)
+    sep = list(sep)
+
+    # now turn into astropy table
+    matches = table_1[idx_1]
+    # get only the ones from table_2 that have matches
+    matches_2 = table_2[idx_2]
+
+    for col in matches_2.colnames:
+        if col in matches.colnames:
+            matches_2.rename_column(col, col + "_2")
+            matches.add_column(matches_2[col + "_2"])
+        else:
+            matches.add_column(matches_2[col])
+
+    matches.add_column(table.Column(data=sep, name="sep [arcsec]"))
+
+    return matches
+
 # Note: these all need to be tested.
+
