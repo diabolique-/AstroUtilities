@@ -120,13 +120,12 @@ def symmetric_match(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
              included, as well as a separate separation column.
     """
 
-    from astropy.coordinates import match_coordinates_sky
+    from astropy.coordinates import match_coordinates_sky, SkyCoord
     from astropy import units as u
+    from astropy import table
 
-    coords_1 = coordinates.SkyCoord(table_1[ra_col_1], table_1[dec_col_1],
-                                    unit=u.degree)
-    coords_2 = coordinates.SkyCoord(table_2[ra_col_2], table_2[dec_col_2],
-                                    unit=u.degree)
+    coords_1 = SkyCoord(table_1[ra_col_1], table_1[dec_col_1], unit=u.degree)
+    coords_2 = SkyCoord(table_2[ra_col_2], table_2[dec_col_2], unit=u.degree)
 
     # find matches for objects in table 1 in table 2
     match_idx_12, sep_12, dist_12 = match_coordinates_sky(coords_1, coords_2)
