@@ -10,7 +10,7 @@ Contents:
 
 
 
-.. automodule:: AstroUtilities.utilities
+.. automodule:: astro_utilities.utilities
     :members:
     :undoc-members:
     :show-inheritance:
