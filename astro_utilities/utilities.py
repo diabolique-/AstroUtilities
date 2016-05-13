@@ -97,6 +97,18 @@ def percent_flux_errors_to_mag_errors(percent_flux_error):
 
 
 def empty_data(datatype):
+    """
+    Makes an empty data of a given datatype. 
+
+    This is useful for filling tables that have missing values.
+
+    Here is what the various datatypes return:
+    Float: np.nan
+    Integer: -999999999999
+    String: Empty string.
+
+    :param datatype: data type, obtained by using `.dtype` on some numpy object.
+    """
     import numpy as np
     if "f" == datatype.kind:
         return np.nan
