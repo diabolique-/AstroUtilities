@@ -1,8 +1,11 @@
-.. _classes:
+.. _utilties:
 
 .. currentmodule:: astro_utilities
 
-.. automodule:: astro_utilities.classes
+Utilities
+=========
+
+.. automodule:: astro_utilities.utilties
     :members:
     :undoc-members:
     :show-inheritance:

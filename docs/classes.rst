@@ -1,8 +1,11 @@
-.. _astropy_helpers:
+.. _classes:
 
 .. currentmodule:: astro_utilities
 
-.. automodule:: astro_utilities.astropy_helpers
+Classes
+=======
+
+.. automodule:: astro_utilities.classes
     :members:
     :undoc-members:
     :show-inheritance:
