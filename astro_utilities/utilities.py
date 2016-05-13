@@ -351,7 +351,7 @@ def check_if_file(possible_location):
         return False
 
 
-def prettier_write(table, out_file, clobber=False):
+def pretty_write(table, out_file, clobber=False):
     """
     Writes an astropy table in a nice format.
 
