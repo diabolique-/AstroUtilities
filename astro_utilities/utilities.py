@@ -266,8 +266,7 @@ def symmetric_match_both(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
     return matches
 
 def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
-          dec_col_1="dec", dec_col_2="dec", max_sep=3.0, 
-          include_all_from_1=True):
+          dec_col_1="dec", dec_col_2="dec", max_sep=3.0):
     """
     Matches objects from two astropy tables by ra/dec. All objects from the 
     first will be matched to one in the second. 
@@ -283,8 +282,6 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
     :param dec_col_2: Name of the dec column in table_2. Defaults to "dec".
     :param max_sep: Maximum separation (in arcseconds) allowed for two objects
                     to be considered a match.
-    :param include_all_from_1: Whether to include all objects, or just 
-                               those with matches.
     :return: Astropy table object containing the matches between the two
              input table objects. All columns from both catalogs will be
              included, as well as a separate separation column.
@@ -322,41 +319,101 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
             matches.add_column(matches_2[col])
             
     matches.add_column(table.Column(data=sep, name="sep [arcsec]"))
-    
-    if include_all_from_1:
-            
-        # This adds all the matches. We need to add all the non-matches
-        non_matches_1 = table_1.copy()
-        non_matches_2 = table_2.copy()
-        non_matches_1.remove_rows(idx_1)
-        non_matches_2.remove_rows(idx_2)
-
-        print non_matches_1
-        print non_matches_2
-
-        for row in non_matches_1:
-            new_row = [item for item in row]
-            for colname in matches.colnames[len(new_row):]:
-                new_row.append(empty_data(matches[colname].dtype))
-            matches.add_row(new_row)
-
-        for row in non_matches_2:
-            new_row = []
-            for colname in matches.colnames[:len(non_matches_1.colnames)]:
-                new_row.append(empty_data(matches[colname].dtype))
-            for item in row:
-                new_row.append(item)
-
-            # add extra spot for separation
-            new_row.append(np.nan)
-            print len(new_row), len(matches.colnames)
-
-            matches.add_row(new_row)
-
-
-
 
     return matches
+
+
+
+def check_if_file(possible_location):
+    """
+    Check if a file already exists at a given location.
+
+    :param possible_location: File to check. Can be a path to a file, too.
+    :type possible_location: str
+    :return: bool representing whether or not a file already exists there.
+    """
+
+    # have to do separate cases for files in current directory and those 
+    # elsewhere. Those with paths has os.sep in their location.
+    if os.sep in possible_location:
+        # get all but the last part, which is the directory
+        directory = os.sep.join(possible_location.split(os.sep)[:-1]) 
+        # then the filename is what's left
+        filename = possible_location.split(os.sep)[-1]
+    else:  # it's in the current directory
+        directory = "."
+        filename = possible_location
+
+    # Then check if the given file exists
+    if filename in os.listdir(directory):
+        return True 
+    else:
+        return False
+
+
+def prettier_write(table, out_file, clobber=False):
+    """
+    Writes an astropy table in a nice format.
+
+    :param table: Astropy table object to write to file.
+    :type table: astropy.table.Table
+    :param out_file: Place to write the resulting ascii file. 
+    :type out_file: str
+    :param clobber: Whether or not to overwrite an existing file, if it exists.
+                    If this is false, the function will exit with an error if
+                    a file already exists here. If clobber is True, it will
+                    overwrite the file there.
+    :type clobber: bool
+
+    """
+    # first check if a file exists there, and raise an error if it does.
+    if not clobber:
+        if check_if_file(out_file):
+            raise IOError("File already exists. "
+                          "Set `clobber=True` if you want to overwrite. ")
+    # will continue if no error is raised.
+    
+    with open(out_file, "w") as output:
+        # set an empty string that defines how the formatting will work, that
+        # we will add to as we go
+        formatting = ""
+        first = True # have to keep track of the first one
+
+        # then use the column names and data within to determine the width each
+        # column will need when written to a file, and put that info in the
+        # formatter variable
+        for col in table.colnames:
+            # find the maximum length of either the column name of the
+            # data in that column. For data, get the length of the string
+            # representation of the object, since that's what will be
+            # written to the file
+            max_data_len = max([len(str(item)) for item in table[col]])
+            max_len = max(max_data_len, len(col))
+            max_len += 5  # add 5 to make it spread out nicer
+            
+            # if it's the first one, add extra for the comment
+            if first:
+                max_len += 2
+                first = False
+            
+            # use this info to add the next part of the formatter
+            # the double braces are so we can get actual braces, then the 
+            # length goes after the "<"
+            formatting += "{{:<{}}}".format(max_len)
+
+        # we are now done with the formatting string, so add a newline
+        formatting += "\n"
+        
+        # Now write the header column
+        colnames = table.colnames
+        # add a comment to the first one
+        colnames[0] = "# " + colnames[0]
+        output.write(formatting.format(*colnames))
+        
+        # then write all the data
+        for line in table:
+            output.write(formatting.format(*line))
+            
 #TODO: write wrappers for the astropy join stuff
 
 # Note: these all need to be tested.
