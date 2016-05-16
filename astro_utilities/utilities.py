@@ -128,6 +128,7 @@ def check_if_file(possible_location):
     :type possible_location: str
     :return: bool representing whether or not a file already exists there.
     """
+    import os
 
     # have to do separate cases for files in current directory and those 
     # elsewhere. Those with paths has os.sep in their location.

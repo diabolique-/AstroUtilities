@@ -22,7 +22,7 @@ def aperture_grid(image, spacing, output=False, clobber=False):
 	          aperture.
 	"""
 	if output and not clobber:
-		if utilities.check_if_file(coords_file):
+		if utilities.check_if_file(output):
 			raise IOError("The coords file {} already exists. "
 				          " Set clobber = True if you're okay with "
 				          "overwriting this.")
@@ -127,8 +127,7 @@ def sky_error(image, aperture_size, flux_conv, plot=True):
 	"""
 
 	# first define the aperture grid
-	coords_file = "{}_coords_temp.txt".format(image)
-	centers = aperture_grid(image, coords_file, aperture_size)
+	centers = aperture_grid(image, aperture_size)
 
 	# then do photometry at those locations. This needs to be without a 
 	# background correction, so we can't use qphot.
