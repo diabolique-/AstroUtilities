@@ -153,14 +153,14 @@ def gaussian(x, mean, sigma, amplitude=None):
     The Gaussian density is defined as 
 
     .. math::
-        f(x) = A e ^ {- \ frac{(x - \mu)^2}{2 \sigma^2}}
+        f(x) = A e ^ {- \\frac{(x - \\mu)^2}{2 \\sigma^2}}
 
     If the Gaussian is normalized,
 
     .. math::
-        A = \frac{1}{\sigma \sqrt{2 \pi}}
+        A = \\frac{1}{\\sigma \\sqrt{2 \\pi}}
 
-    
+
 
     :param x: location to get the Gaussian density at.
     :type x: float
@@ -172,6 +172,7 @@ def gaussian(x, mean, sigma, amplitude=None):
                       specified, it will be chosen so that the total area
                       under the Gaussian is 1.
     :return: Gaussain density of the given gaussian at the given x value. 
+
     """
 
     # first see if amplitude is defined, and if not, normalize it.
