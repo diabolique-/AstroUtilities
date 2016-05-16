@@ -107,7 +107,7 @@ def empty_data(datatype):
     Float: np.nan
 
     Integer: -999999999999
-    
+
     String: Empty string.
 
     :param datatype: data type, obtained by using `.dtype` on some numpy object.
@@ -145,6 +145,40 @@ def check_if_file(possible_location):
         return True 
     else:
         return False
+
+def gaussian(x, mean, sigma, amplitude=None):
+    """
+    The Gaussian density at the given value.
+
+    The Gaussian density is defined as 
+
+    .. math::
+        f(x) = A e ^ {- \ frac{(x - \mu)^2}{2 \sigma^2}}
+
+    If the Gaussian is normalized,
+
+    .. math::
+        A = \frac{1}{\sigma \sqrt{2 \pi}}
+
+    
+
+    :param x: location to get the Gaussian density at.
+    :type x: float
+    :param mean: Mean of the Gaussian.
+    :type mean: float
+    :param sigma: Standard deviation of the Gaussian. Should be positive
+    :type sigma: float
+    :param amplitude: Height of the highest point of the Gaussian. If not 
+                      specified, it will be chosen so that the total area
+                      under the Gaussian is 1.
+    :return: Gaussain density of the given gaussian at the given x value. 
+    """
+
+    # first see if amplitude is defined, and if not, normalize it.
+    if amplitude is not None:
+        amplitude = 1.0 / (sigma * np.sqrt(2 * np.pi))
+
+    return amplitude * np.e ** (-1 * ((x - mean)**2 / (2 * sigma**2)))
 
 # Note: these all need to be tested.
 
