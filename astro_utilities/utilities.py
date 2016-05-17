@@ -219,9 +219,9 @@ def flux_conv(flux_zeropont, counts_zeropoint):
 
         \\frac{F}{C} = 10^{\\frac{Z_F - Z_C}{2.5}}
 
-        F = C 10^{\\frac{Z_F - Z_C}{2.5}}
+        F = C * 10^{\\frac{Z_F - Z_C}{2.5}}
 
-        F = C * \\text(Flux Conversion)
+        F = C * \\text{Flux Conversion}
 
         \\text{where Flux Conversion $= 10^{\\frac{Z_F - Z_C}{2.5}}$}
 
@@ -242,7 +242,7 @@ def flux_conv(flux_zeropont, counts_zeropoint):
                              header of the image in question.
     :type counts_zeropoing: float
     :returns: float containing the conversion from counts to flux, such that
-              flux = counts * flux_conv. See about for derivation.
+              flux = counts * flux_conv. See above for derivation.
 
     """
 
