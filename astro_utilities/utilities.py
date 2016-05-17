@@ -41,6 +41,7 @@ def mag_to_flux(mag, zeropoint):
     :param zeropoint: zeropoint (in mags) of the magnitude system being used
     :return: flux that corresponds to the given magnitude
     """
+
     return 10**((zeropoint - mag)/2.5)
 
 
@@ -54,6 +55,7 @@ def flux_to_mag(flux, zeropoint):
     :param zeropoint: zeropoint of the system (in mags)
     :return: magnitude that corresponds to the given flux
     """
+
     import numpy as np
     try:
         return -2.5 * np.log10(flux) + zeropoint  # This is just the definition of magnitude
@@ -76,6 +78,7 @@ def mag_errors_to_percent_flux_errors(mag_error):
     :param mag_error: magnitude error
     :return: percentage flux error corresponding to this magnitude error.
     """
+
     return mag_error * (np.log(10) / 2.5)  # math.log takes natural log unless specified.
 
 def percent_flux_errors_to_mag_errors(percent_flux_error):
@@ -90,6 +93,7 @@ def percent_flux_errors_to_mag_errors(percent_flux_error):
     :param percent_flux_error: percentage flux error
     :return: magnitude error corresponding to the percentage flux error.
     """
+
     return (2.5 / np.log(10)) * percent_flux_error
 
 
@@ -109,6 +113,7 @@ def empty_data(datatype):
 
     :param datatype: data type, obtained by using `.dtype` on some numpy object.
     """
+
     if "f" == datatype.kind:
         return np.nan
     elif "i" == datatype.kind:
@@ -203,14 +208,23 @@ def flux_conv(flux_zeropont, counts_zeropoint):
 
     .. math::
         \\text{mag}_\\text{flux} = \\text{mag}_\\text{counts}
+
         -2.5 \\log_{10}(F) + Z_F = -2.5 \\log_{10}(C) + Z_C
+
         \\text{where $F = $ Flux, $C = $ counts, and $Z_F$ and $Z_C$ represent the respective zeropoints when using flux or counts}
+
         -2.5(\\log_{10}(F) - \\log_{10}(C)) = Z_C - Z_F
+
         \\log_{10} \\left( \\frac{F}{C} \right) = \\frac{Z_F - Z_C}{2.5}
+
         \\frac{F}{C} = 10^{\\frac{Z_F - Z_C}{2.5}}
+
         F = C 10^{\\frac{Z_F - Z_C}{2.5}}
+
         F = C * \\text(Flux Conversion)
+
         \\text{where Flux Conversion $= 10^{\\frac{Z_F - Z_C}{2.5}}}
+        
 
     This flux conversion is what is calculated here.
 
@@ -231,6 +245,7 @@ def flux_conv(flux_zeropont, counts_zeropoint):
               flux = counts * flux_conv. See about for derivation.
 
     """
+
     return 10 ** ((flux_zeropont - counts_zeropoint) / 2.5)
 
 # Store the vega to AB conversions. They must all be of the form 
