@@ -215,7 +215,7 @@ def flux_conv(flux_zeropont, counts_zeropoint):
 
         -2.5(\\log_{10}(F) - \\log_{10}(C)) = Z_C - Z_F
 
-        \\log_{10} \\left( \\frac{F}{C} \right) = \\frac{Z_F - Z_C}{2.5}
+        \\log_{10} \\left( \\frac{F}{C} \\right) = \\frac{Z_F - Z_C}{2.5}
 
         \\frac{F}{C} = 10^{\\frac{Z_F - Z_C}{2.5}}
 
