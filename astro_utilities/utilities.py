@@ -223,8 +223,8 @@ def flux_conv(flux_zeropont, counts_zeropoint):
 
         F = C * \\text(Flux Conversion)
 
-        \\text{where Flux Conversion $= 10^{\\frac{Z_F - Z_C}{2.5}}}
-        
+        \\text{where Flux Conversion $= 10^{\\frac{Z_F - Z_C}{2.5}}$}
+
 
     This flux conversion is what is calculated here.
 
