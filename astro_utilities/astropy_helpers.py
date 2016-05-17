@@ -162,7 +162,8 @@ def symmetric_match_both(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
     return matches
 
 def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
-          dec_col_1="dec", dec_col_2="dec", max_sep=3.0):
+          dec_col_1="dec", dec_col_2="dec", max_sep=3.0,
+          include_all_from_1=False):
     """
     Matches objects from two astropy tables by ra/dec. All objects from the 
     first will be matched to one in the second. 
@@ -178,6 +179,8 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
     :param dec_col_2: Name of the dec column in table_2. Defaults to "dec".
     :param max_sep: Maximum separation (in arcseconds) allowed for two objects
                     to be considered a match.
+    :param include_all_from_1: Whether or not to include all rows from table 1,
+                               not just those that have matches.
     :return: Astropy table object containing the matches between the two
              input table objects. All columns from both catalogs will be
              included, as well as a separate separation column.
@@ -193,11 +196,11 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
     # and find matches for objects in table 2 in table 1
     match_idx_21, sep_21, dist_21 = match_coordinates_sky(coords_2, coords_1)
     
-    # get the matches that are close enough
+    # get the matches that are close enough, and those separations
     match_idx = match_idx_12[np.where(sep_12 < max_sep * u.arcsec)]
     sep = sep_12[np.where(sep_12 < max_sep * u.arcsec)]
 
-    # now turn into astropy table
+    # now trim the table into ones that have a close match.
     matches = table_1[np.where(sep_12 < max_sep * u.arcsec)]
     # get only the ones from table_2 that have matches
     matches_2 = table_2[match_idx]
@@ -210,6 +213,21 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
             matches.add_column(matches_2[col])
             
     matches.add_column(table.Column(data=sep, name="sep [arcsec]"))
+
+    if include_all_from_1:
+        # We added all the matches, we need to include all the non-matches.
+        non_matches_1 = table_1[np.where(sep_12 > max_sep * u.arcsec)]
+
+        # add all to the new_table
+        for row in non_matches_1:
+            new_row = [item for item in row]
+            # we have to fill the rest with empty data, since nothing exists.
+            # get the leftover columns
+            for colname in matches.colnames[len(new_row):]:
+                # then add empty data of the appropriate type
+                new_row.append(utilities.empty_data(matches[colname].dtype))
+            # we have a full row, so we can add it.
+            matches.add_row(new_row)
 
     return matches
 

@@ -1,5 +1,6 @@
 from astropy.io import fits
 import numpy as np
+import os
 
 import utilities
 
@@ -49,14 +50,16 @@ def aperture_grid(image, spacing, output=False, clobber=False):
 	# then if the user wants to, write to the file
 	if output:
 		with open(output, "w") as output_file:
-			for x, y in ordered_pairs:
-				output_file.write("{} {}".format(x, y))
+			for pair in ordered_pairs:
+				x, y = pair
+				output_file.write("{} {}\n".format(x, y))
 
 	# no matter what, return the ordered pairs
 	return ordered_pairs
 
 
-def fit_gaussian_negative(data, upper_cutoff):
+def fit_gaussian_negative(data, upper_cutoff, plot=False, savename=None,
+	                      data_label="Counts"):
 	"""
 	Fits a Gaussain to all data underneath some cutoff.
 
@@ -71,31 +74,102 @@ def fit_gaussian_negative(data, upper_cutoff):
 	:param upper_cutoff: Data below this number will be used to fit the 
 	                     Gaussian, while data above this will be rejected.
 	:type upper_cutoff: float
-	:param plot: Whether or not to plot the Gaussian. It this is true, the
-	             figure will be returned also.
+	:param plot: Whether or not to create a plot showing the best fit to the
+	             histogram of the data.
 	:type plot: bool
-	:return: the mean, sigma, and amplitude of the best fit Gaussian.
+	:param savename: If you are creating a plot, enter a file path here to save
+	                 the figure. If this is left as none, then the plot will 
+	                 not be saved. If you are running in an Jupyter notebook,
+	                 the figure will show up even if it is not saved, so it's 
+	                 not essential.
+	:type savename: str
+	:param data_label: Descriptor of the data that will be used on the x-axis
+	                   of the data histogram. Defaults to "Flux" unless 
+	                   otherwise specified.
+	:type data_label: str
+	:return: the mean and sigma of the best fit Gaussian.
 	"""
 	from scipy.optimize import curve_fit
 
 	good_data = [item for item in data if item < upper_cutoff]
 
-	# figure out the number of bins to have in the histogram, which is what the
-	# gaussian will be fitted to under the hood
-	bins = int(np.ceil(np.sqrt(len(data))))
+	# make the bins that will be used to fit things
+	bins = np.linspace(min(data), upper_cutoff, 250)
 
-	bin_values, bin_edges = np.histogram(data, bins=bins, density=True)
+
+	bin_values, bin_edges = np.histogram(good_data, bins=bins)
 
 	# turn the edges into centers of the bins
 	bin_centers = []
 	for i in range(len(bin_edges) - 1):  # iterate through all left edges
+		# then take the average of the left and right edges.
 		center = np.mean([bin_edges[i], bin_edges[i+1]])
 		bin_centers.append(center)
 
+	# we can then fit the gaussian using Scipy.
 	params, uncertainty = curve_fit(utilities.gaussian, xdata=bin_centers,
 	                                ydata=bin_values)
+	# we know what the params are, so find them.
+	mean, sigma, amplitude = params
+	# get rid of any sign on sigma, which sometimes happens
+	sigma = abs(sigma)
 
-	return params
+	# now we need to plot the histogram if the user wants. 
+	if plot:
+		# import the things needed to plot
+		import prettyplot as ppl
+		import matplotlib.pyplot as plt
+		ppl.default_style()
+
+		fig, ax = plt.subplots()
+		# set the new bounds for the histogram. We want to reuse the old bounds
+		# on the left side, plus make an equally spaced one on the upper side
+		lower_lim = min(data)
+		# the upper boundary goes the same distance as the lower boundary 
+		# from the upper_cutoff, which will be the center of the plot
+		upper_lim  = upper_cutoff + (upper_cutoff - min(data))
+
+		# then turn this into bins.
+		bins = np.linspace(lower_lim, upper_lim, 500)
+        ppl.hist(data, bins=bins, label="Data")
+        
+        # Then get the overplotted gaussian
+        xs = np.linspace(lower_lim, upper_lim, 5000)
+        ys = utilities.gaussian(xs, mean, sigma, amplitude)
+        plt.plot(xs, ys, c=ppl.almost_black, lw=3, label="Best fit")
+
+        # Then format the plot nicelay
+        ppl.legend(loc="upper right")
+        ppl.set_limits(mean - 4 * sigma, mean + 4 * sigma)
+        ppl.add_labels(data_label, "Number")
+
+        # If the user wants to, save the figure.
+        if savename is not None:
+        	plt.savefig(savename, format=savename[-3:])
+
+	# return only the params that matter, since the amplitude is determined
+	# by our choice of binning.
+	return mean, sigma
+
+# def ap_phot(center_row_idx, center_col_idx, image_data, aperture_radius):
+# 	"""
+# 	This does aperture photometry without any background subtraction. 
+
+# 	NOte: This is untested and needs to be re-written. Don't use this.
+# 	"""
+    
+#     flux = 0
+#     min_row = int(max(np.ceil(aperture_radius), np.floor(center_row_idx - aperture_radius)))
+#     max_row = int(min(image_data.shape[0] - np.ceil(aperture_radius) - 1, np.ceil(center_row_idx + aperture_radius)))
+#     # I subtracted one from the shape to get the index, which is not the same as the length.
+#     min_col = int(max(np.ceil(aperture_radius), np.floor(center_col_idx - aperture_radius)))
+#     max_col = int(min(image_data.shape[1] - np.ceil(aperture_radius) - 1, np.ceil(center_col_idx + aperture_radius)))
+    
+#     for row_idx in range(min_row, max_row + 1):  # plus one to include the max value
+#         for col_idx in range(min_col, max_col + 1):
+#             if np.sqrt((row_idx - center_row_idx)**2 + (col_idx - center_col_idx)**2) < aperture_radius:
+#                 flux += image_data[row_idx][col_idx]
+#     return flux
 
 def sky_error(image, aperture_size, flux_conv, plot=True):
 	"""
@@ -128,11 +202,11 @@ def sky_error(image, aperture_size, flux_conv, plot=True):
 	"""
 
 	# first define the aperture grid
-	centers = aperture_grid(image, aperture_size)
+	aperture_grid(image, aperture_size, 
+		          '{}_ap_grid.txt'.format(image.split(os.sep)[-1]))
 
-	# then do photometry at those locations. This needs to be without a 
-	# background correction, so we can't use qphot.
-	return
+	# then do photometry at those locations. 
+
 
 	# THIS FUNCTION IS NOT DONE.
 
