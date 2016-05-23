@@ -204,7 +204,7 @@ def flux_conv(flux_zeropont, counts_zeropoint):
 
     This is done by using the zeropoints of the magnitudes in flux and counts.
     The magnitude should be the same no matter how we calculate it, which is
-    how we can derive this. 
+    how we can derive this:
 
     .. math::
         \\text{mag}_\\text{flux} = \\text{mag}_\\text{counts}
