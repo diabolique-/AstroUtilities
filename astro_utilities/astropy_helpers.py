@@ -64,7 +64,7 @@ def symmetric_match(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
         else:
             matches.add_column(matches_2[col])
 
-    matches.add_column(table.Column(data=sep.arcsec, name="sep [arcsec]"))
+    matches.add_column(table.Column(data=sep * u.arcsec, name="sep [arcsec]"))
 
     return matches
 
@@ -132,7 +132,7 @@ def symmetric_match_both(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
         else:
             matches.add_column(matches_2[col])
             
-    matches.add_column(table.Column(data=sep.arcsec, name="sep [arcsec]"))
+    matches.add_column(table.Column(data=sep * u.arcsec, name="sep [arcsec]"))
             
     # This adds all the matches. We need to add all the non-matches
     non_matches_1 = table_1.copy()
@@ -212,7 +212,7 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
         else:
             matches.add_column(matches_2[col])
             
-    matches.add_column(table.Column(data=sep.arcsec, name="sep [arcsec]"))
+    matches.add_column(table.Column(data=sep * u.arcsec, name="sep [arcsec]"))
 
     if include_all_from_1:
         # We added all the matches, we need to include all the non-matches.
