@@ -3,11 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to astro_utilties's documentation!
+Welcome to Sinistra's documentation!
 ==========================================
 
-astro_utilities is a Python library of functions I've found useful in my time
+Sinistra is a Python library of functions I've found useful in my time
 doing astronomy. They may or may not be useful to anyone else. 
+
+The name Sinistra comes from the name of the astronomy professor at Hogwarts 
+in the Harry Potter universe, Professor Sinistra.
 
 Contents:
 

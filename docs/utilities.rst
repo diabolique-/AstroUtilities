@@ -1,11 +1,11 @@
 .. _utilities:
 
-.. currentmodule:: astro_utilities
+.. currentmodule:: sinistra
 
 Utilities
 =========
 
-.. automodule:: astro_utilities.utilities
+.. automodule:: sinistra.utilities
     :members:
     :undoc-members:
     :show-inheritance:

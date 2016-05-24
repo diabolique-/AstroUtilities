@@ -1,11 +1,11 @@
 .. _phot:
 
-.. currentmodule:: astro_utilities
+.. currentmodule:: sinistra
 
 Photometry
 ==========
 
-.. automodule:: astro_utilities.phot
+.. automodule:: sinistra.phot
     :members:
     :undoc-members:
     :show-inheritance:

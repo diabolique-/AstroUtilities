@@ -1,11 +1,11 @@
 .. _astropy_helpers:
 
-.. currentmodule:: astro_utilities
+.. currentmodule:: sinistra
 
 Astropy Helpers
 ===============
 
-.. automodule:: astro_utilities.astropy_helpers
+.. automodule:: sinistra.astropy_helpers
     :members:
     :undoc-members:
     :show-inheritance:
