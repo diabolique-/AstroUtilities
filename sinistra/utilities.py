@@ -56,10 +56,9 @@ def flux_to_mag(flux, zeropoint):
     :return: magnitude that corresponds to the given flux
     """
 
-    import numpy as np
     try:
-        return -2.5 * np.log10(flux) + zeropoint  # This is just the definition of magnitude
-    except ValueError:  # the flux might be negative, and will mess things up
+        return -2.5 * np.log10(flux) + zeropoint    # def of magnitude
+    except ValueError:  # the flux might be negative
         return np.nan
 
 
