@@ -1,4 +1,13 @@
-.idea/*
+# Pycharm stuff
+.idea/
+
+# ipython checkpoints
+.ipynb_checkpoints
+
 *.pyc
+
 docs/_*
 docs/Makefile
+dist
+sinistra.egg-info
+build

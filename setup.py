@@ -11,7 +11,7 @@ setup(
 	url="http://sinistra.readthedocs.io/en/latest/",
 
 	author="Gillen Brown",
-	author_email="gillenb@umich.edu",
+	author_email="gillenbrown@gmail.com",
 
 	license="GNU GPLv3",
 
