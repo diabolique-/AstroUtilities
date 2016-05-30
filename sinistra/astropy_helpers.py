@@ -299,5 +299,134 @@ def pretty_write(table, out_file, clobber=False):
         # then write all the data
         for line in table:
             output.write(formatting.format(*line))
-            
-#TODO: write wrappers for the astropy join stuff
+        
+
+def wcs_to_xy(ra, dec, image_path):
+    """
+    Turn lists of RA and Dec into pixel values for a given image.
+
+    This is just a wrapper for the wcs tools in astropy, and it returns the
+    same thing as the Astropy `wcs.all_world2pix()` function.
+
+    The best way to call this function is to do:
+    `x, y = wcs_to_xy(ra, dec, image_path)`
+
+    Also note the `table_wcs_to_xy()` function, which is a wrapper for this 
+    function when you have an astropy table containing your RA and Dec.
+    
+    :param ra: List of RA values.
+    :type ra: list of floats
+    :param dec: List of Dec values.
+    :type dec: list of floats
+    :param image_path: File path to the FITS image that will used to calculate 
+                       the pixel values. 
+    :type image_path: str
+    :return: Lists of the x and y pixel values of the objects. 
+    :rtype: tuple of lists of floats
+
+    """
+    image_wcs = wcs.WCS(image_path)
+    return image_wcs.all_world2pix(ra, dec, 1)
+
+def xy_to_wcs(x, y, image_path):
+    """
+    Turn lists of x and y pixel locations into RA and Dec for a given image.
+
+    This is just a wrapper for the wcs tools in astropy, and it returns the
+    same thing as the Astropy `wcs.all_pix2world()` function.
+
+    The best way to call this function is to do:
+    `ra, dec = xy_to_wcs(x, y, image_path)`
+
+    Also note the `table_x_to_wcs()` function, which is a wrapper for this 
+    function when you have an astropy table containing your x and y values.
+    
+    :param x: List of x pixel locations.
+    :type x: list of floats
+    :param y: List of y pixel locations.
+    :type y: list of floats
+    :param image_path: File path to the FITS image that will used to calculate 
+                       the WCS coordinates. 
+    :type image_path: str
+    :return: Lists of the ra and dec of the objects. 
+    :rtype: tuple of lists of floats
+    """
+    image_wcs = wcs.WCS(image_path)
+    return image_wcs.all_pix2world(x, y, 1)
+
+def table_wcs_to_xy(catalog, image_path, ra_col="ra", dec_col="dec",
+                    x_col="x", y_col="y"):
+    """
+    Adds x and y pixel location columns to a table containig RA/Dec info.
+
+    This function takes an astropy table with columns containing the RA and Dec
+    of the objects, and adds columns containing the x and y pixel values of
+    these objects in a given image. 
+
+    This is just a wrapper for the `wcs_to_xy()` function, which in turn is a 
+    wrapper for the Astropy `wcs.all_world2pix()` function.
+
+    Note that although this function returns the table, it is modified in 
+    place, so you don't need to catch the output.
+
+    :param catalog: Table that has RA and Dec columns, whose names are specified
+                    below.
+    :type catalog: astropy.table.Table
+    :param image_path: File path to the FITS image that will used to calculate 
+                       the pixel values. 
+    :type image_path: str
+    :param ra_col: Name of the RA column in your `catalog`. Defaults to "ra".
+    :type ra_col: str
+    :param dec_col: Name of the Dec column in your `catalog`. Defaults to "dec".
+    :type dec_col: str
+    :param x_col: Name of the column holding the x values that will be created.
+                  Defaults to "x".
+    :type x_col: str
+    :param y_col: Name of the column holding the y values that will be created.
+                  Defaults to "y".
+    :return: Catalog with the added x and y columns. Note that the table is 
+             modified in place, so this isn't strictly necessary.
+    :rtype: astropy.table.Table
+    """
+    x, y = ra_dec_to_xy(catalog["ra"], catalog["dec"], image_path)
+    catalog[x_col] = x
+    catalog[y_col] = y
+    return catalog
+
+def table_xy_to_wcs(catalog, image_path, x_col="x", y_col="y",
+                    ra_col="ra", dec_col="dec"):
+    """
+    Adds RA/Dec columns to a table containig pixel locations.
+
+    This function takes an astropy table with columns containing the x and y 
+    values of the locations of your objects, and adds columns containing the 
+    ra and dec of these objects in a given image. 
+
+    This is just a wrapper for the `xy_to_wcs()` function, which in turn is a 
+    wrapper for the Astropy `wcs.all_pix2world()` function.
+
+    Note that although this function returns the table, it is modified in 
+    place, so you don't need to catch the output.
+
+    :param catalog: Table that has x and y columns, whose names are specified
+                    below.
+    :type catalog: astropy.table.Table
+    :param image_path: File path to the FITS image that will used to calculate 
+                       the pixel values. 
+    :type image_path: str
+    :param x_col: Name of the column holding the x values. Defaults to "x".
+    :type x_col: str
+    :param y_col: Name of the column holding the y values. Defaults to "y".
+    :param ra_col: Name of the RA column that will be created. Defaults to "ra".
+    :type ra_col: str
+    :param dec_col: Name of the Dec column that will be created. Defaults 
+                    to "dec".
+    :type dec_col: str
+    :return: Catalog with the added RA and Dec columns. Note that the table is 
+             modified in place, so this isn't strictly necessary.
+    :rtype: astropy.table.Table
+    """
+    ra, dec = xy_to_ra_dec(catalog[x_col], catalog[y_col], image_path)
+    catalog[ra_col] = ra
+    catalog[dec_col] = dec
+    return catalog
