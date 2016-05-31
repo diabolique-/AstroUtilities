@@ -1,10 +1,13 @@
 from astropy.coordinates import match_coordinates_sky, SkyCoord
 from astropy import units as u
 from astropy import table
+from astropy import io
+from astropy import wcs
 import os
 import numpy as np
 
 import utilities
+
 
 def symmetric_match(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
           dec_col_1="dec", dec_col_2="dec", max_sep=3.0):
