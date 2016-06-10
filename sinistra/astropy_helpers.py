@@ -433,3 +433,76 @@ def table_xy_to_wcs(catalog, image_path, x_col="x", y_col="y",
     catalog[ra_col] = ra
     catalog[dec_col] = dec
     return catalog
+
+def num_nearby(ras, decs, max_sep=5):
+    """
+    Calculate the number of objects that are within some separation.
+
+    For each object, this calculates the number of objects within some distance
+    on the sky. 
+
+    See `table_num_nearby` if you have an astropy table with the ra/dec info.
+
+    :param ras: list of RA values for all the objects.
+    :type ras: list
+    :param decs: list of Dec values for all the objects.
+    :type decs: list
+    :param max_sep: Maximum separation (in arcseconds) of two objects for 
+                    them to be considered neighbors. 
+
+    """
+    # first turn our coordinates into SkyCoord objects, so we can get separation
+    coords = SkyCoord(ras, decs unit=u.degree)
+
+    # initialize an array of the number of neighbors each object has
+    neighbors = np.zeros(len(coords))
+
+    # BASIC ALGORITHM
+    # We will use the match_to_catalog_sky() function, which returns the 
+    # separation of the nth closest object in the catalog. We will start at 2
+    # (which is the closest object other than itself). For each object in the 
+    # catalog, we will see if the nth match is within the required distance.
+    # If it is, we will increment a counter.
+    iteration = 2
+    while True:
+        idx, sep, dist = coords.match_to_catalog_sky(coords, iteration)
+        # get an array where each entry is 1 if the match is within max_sep, and
+        # zero if the match is not close enough
+        close_enough = np.where(sep < max_sep * u.arcsec, 
+                                np.ones(len(coords)), np.zeros(len(coords)))
+        # we then add thisto neighbors, which basically increments the number
+        # of nearby objects for the objects that have one this iteration
+        neighbors += close_enough
+
+        # continue until none of the objects have close matches.
+        if not np.any(close_enough):
+            return neighbors
+    
+
+def table_num_nearby(catalog, ra_col="ra", dec_col="dec", 
+                     num_nearby_col="nearby", max_sep=5):
+    """ Wrapper for `num_nearby()` that supports astropy tables.
+    
+    See the `num_nearby()` documentation for more info.
+
+    :param catalog: Astropy table object that holds ra/dec info.
+    :type catalog: astropy.table.Table
+    :param ra_col: name of the RA column in `catalog`.
+    :type ra_col: str
+    :param dec_col: name of the Dec column in `catalog`.
+    :type dec_col: str
+    :param num_nearby_col: name of the column to add to the table with the
+                           results of `num_nearby()`
+    :type num_nearby_col: str
+    :param max_sep: Maximum separation (in arcseconds) of two objects for 
+                    them to be considered neighbors. Will be passed directly
+                    to `num_nearby()`
+    :type max_sep: float
+    :returns: None, but modifies the table 
+    """
+
+    catalog[num_nearby_col] = num_nearby(catalog[ra_col], catalog[dec_col],
+                                         max_sep)
+    
+# TODO: make a scalar version of those nearby functions (ie where one location
+#       is matched to a large catalog)
