@@ -467,8 +467,10 @@ def num_nearby(ras, decs, max_sep=5):
     while True:
         idx, sep, dist = coords.match_to_catalog_sky(coords, iteration)
         # get an array where each entry is 1 if the match is within max_sep, and
-        # zero if the match is not close enough
-        close_enough = np.where(sep < max_sep * u.arcsec, 
+        # zero if the match is not close enough. The greater than zero ignores
+        # identical objects, if for some reason that are multiple identical
+        # objects in the catalog
+        close_enough = np.where(0 * u.arcsec < sep <= max_sep * u.arcsec, 
                                 np.ones(len(coords)), np.zeros(len(coords)))
         # we then add thisto neighbors, which basically increments the number
         # of nearby objects for the objects that have one this iteration
