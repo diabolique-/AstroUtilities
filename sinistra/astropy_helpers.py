@@ -452,7 +452,7 @@ def num_nearby(ras, decs, max_sep=5):
 
     """
     # first turn our coordinates into SkyCoord objects, so we can get separation
-    coords = SkyCoord(ras, decs unit=u.degree)
+    coords = SkyCoord(ras, decs, unit=u.degree)
 
     # initialize an array of the number of neighbors each object has
     neighbors = np.zeros(len(coords))
@@ -470,19 +470,22 @@ def num_nearby(ras, decs, max_sep=5):
         # zero if the match is not close enough. The greater than zero ignores
         # identical objects, if for some reason that are multiple identical
         # objects in the catalog
-        close_enough = np.where(0 * u.arcsec < sep <= max_sep * u.arcsec, 
+        close_enough = np.where(sep <= max_sep * u.arcsec, 
                                 np.ones(len(coords)), np.zeros(len(coords)))
-        # we then add thisto neighbors, which basically increments the number
+        
+        # we then add this to neighbors, which basically increments the number
         # of nearby objects for the objects that have one this iteration
         neighbors += close_enough
 
         # continue until none of the objects have close matches.
         if not np.any(close_enough):
             return neighbors
+        
+        iteration += 1
     
 
 def table_num_nearby(catalog, ra_col="ra", dec_col="dec", 
-                     num_nearby_col="nearby", max_sep=5):
+                     max_sep=5, num_nearby_col="num_nearby"):
     """ Wrapper for `num_nearby()` that supports astropy tables.
     
     See the `num_nearby()` documentation for more info.
@@ -493,16 +496,16 @@ def table_num_nearby(catalog, ra_col="ra", dec_col="dec",
     :type ra_col: str
     :param dec_col: name of the Dec column in `catalog`.
     :type dec_col: str
-    :param num_nearby_col: name of the column to add to the table with the
-                           results of `num_nearby()`
-    :type num_nearby_col: str
     :param max_sep: Maximum separation (in arcseconds) of two objects for 
                     them to be considered neighbors. Will be passed directly
                     to `num_nearby()`
     :type max_sep: float
+    :param num_nearby_col: name of the column to add to the table with the
+                           results of `num_nearby()`
+    :type num_nearby_col: str
     :returns: None, but modifies the table 
     """
-
+    
     catalog[num_nearby_col] = num_nearby(catalog[ra_col], catalog[dec_col],
                                          max_sep)
     

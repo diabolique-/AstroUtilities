@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name="sinistra",
-
+ 
 	version="0.3.1",
 
 	description="A collection of astronomy related tools.",
