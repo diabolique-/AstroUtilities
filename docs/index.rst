@@ -17,7 +17,9 @@ Installation
 
 The package is available in PyPI, so you can install with `pip install sinistra`.
 This is the easiest way. You can also download from 
-[Github.](https://github.com/gillenbrown/sinistra)
+Github_.
+
+.. _Github: https://github.com/gillenbrown/Sinistra
 
 Contents:
 
