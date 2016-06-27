@@ -117,9 +117,9 @@ def fit_gaussian_negative(data, upper_cutoff, plot=False, savename=None,
 	# now we need to plot the histogram if the user wants. 
 	if plot:
 		# import the things needed to plot
-		import prettyplot as ppl
+		import betterplotlib as bpl
 		import matplotlib.pyplot as plt
-		ppl.default_style()
+		bpl.default_style()
 
 		fig, ax = plt.subplots()
 		# set the new bounds for the histogram. We want to reuse the old bounds
@@ -131,17 +131,17 @@ def fit_gaussian_negative(data, upper_cutoff, plot=False, savename=None,
 
 		# then turn this into bins.
 		bins = np.linspace(lower_lim, upper_lim, 500)
-        ppl.hist(data, bins=bins, label="Data")
+        bpl.hist(data, bins=bins, label="Data")
         
         # Then get the overplotted gaussian
         xs = np.linspace(lower_lim, upper_lim, 5000)
         ys = utilities.gaussian(xs, mean, sigma, amplitude)
-        plt.plot(xs, ys, c=ppl.almost_black, lw=3, label="Best fit")
+        plt.plot(xs, ys, c=bpl.almost_black, lw=3, label="Best fit")
 
         # Then format the plot nicelay
-        ppl.legend(loc="upper right")
-        ppl.set_limits(mean - 4 * sigma, mean + 4 * sigma)
-        ppl.add_labels(data_label, "Number")
+        bpl.legend(loc="upper right")
+        bpl.set_limits(mean - 4 * sigma, mean + 4 * sigma)
+        bpl.add_labels(data_label, "Number")
 
         # If the user wants to, save the figure.
         if savename is not None:

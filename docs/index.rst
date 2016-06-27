@@ -12,6 +12,13 @@ doing astronomy. They may or may not be useful to anyone else.
 The name Sinistra comes from the name of the astronomy professor at Hogwarts 
 in the Harry Potter universe, Professor Sinistra.
 
+Installation
+------------
+
+The package is available in PyPI, so you can install with `pip install sinistra`.
+This is the easiest way. You can also download from 
+[Github.](https://github.com/gillenbrown/sinistra)
+
 Contents:
 
 .. toctree::
