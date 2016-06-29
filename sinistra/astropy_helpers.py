@@ -215,7 +215,7 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
         else:
             matches.add_column(matches_2[col])
             
-    matches.add_column(table.Column(data=sep * u.arcsec, name="sep [arcsec]"))
+    matches.add_column(table.Column(data=sep.arcsec, name="sep [arcsec]"))
 
     if include_all_from_1:
         # We added all the matches, we need to include all the non-matches.
@@ -233,10 +233,6 @@ def match_one(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
             matches.add_row(new_row)
 
     return matches
-
-
-
-
 
 
 def pretty_write(table, out_file, clobber=False):
@@ -391,7 +387,7 @@ def table_wcs_to_xy(catalog, image_path, ra_col="ra", dec_col="dec",
              modified in place, so this isn't strictly necessary.
     :rtype: astropy.table.Table
     """
-    x, y = ra_dec_to_xy(catalog["ra"], catalog["dec"], image_path)
+    x, y = wcs_to_xy(catalog["ra"], catalog["dec"], image_path)
     catalog[x_col] = x
     catalog[y_col] = y
     return catalog
@@ -429,7 +425,7 @@ def table_xy_to_wcs(catalog, image_path, x_col="x", y_col="y",
              modified in place, so this isn't strictly necessary.
     :rtype: astropy.table.Table
     """
-    ra, dec = xy_to_ra_dec(catalog[x_col], catalog[y_col], image_path)
+    ra, dec = xy_to_wcs(catalog[x_col], catalog[y_col], image_path)
     catalog[ra_col] = ra
     catalog[dec_col] = dec
     return catalog
