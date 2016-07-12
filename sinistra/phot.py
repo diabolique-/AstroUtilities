@@ -41,8 +41,8 @@ def aperture_grid(image, spacing, output=False, clobber=False):
 	xs = np.arange(spacing / 2.0, x_max, spacing)
 	ys = np.arange(spacing / 2.0, y_max, spacing)
 
- 	# Then turn these into ordered pairs.
- 	ordered_pairs = []
+	# Then turn these into ordered pairs.
+	ordered_pairs = []
 	for x in xs:
 		for y in ys:
 			ordered_pairs.append((x, y))
@@ -131,21 +131,21 @@ def fit_gaussian_negative(data, upper_cutoff, plot=False, savename=None,
 
 		# then turn this into bins.
 		bins = np.linspace(lower_lim, upper_lim, 500)
-        bpl.hist(data, bins=bins, label="Data")
-        
-        # Then get the overplotted gaussian
-        xs = np.linspace(lower_lim, upper_lim, 5000)
-        ys = utilities.gaussian(xs, mean, sigma, amplitude)
-        plt.plot(xs, ys, c=bpl.almost_black, lw=3, label="Best fit")
+		bpl.hist(data, bins=bins, label="Data")
 
-        # Then format the plot nicelay
-        bpl.legend(loc="upper right")
-        bpl.set_limits(mean - 4 * sigma, mean + 4 * sigma)
-        bpl.add_labels(data_label, "Number")
+		# Then get the overplotted gaussian
+		xs = np.linspace(lower_lim, upper_lim, 5000)
+		ys = utilities.gaussian(xs, mean, sigma, amplitude)
+		plt.plot(xs, ys, c=bpl.almost_black, lw=3, label="Best fit")
 
-        # If the user wants to, save the figure.
-        if savename is not None:
-        	plt.savefig(savename, format=savename[-3:])
+		# Then format the plot nicelay
+		bpl.legend(loc="upper right")
+		bpl.set_limits(mean - 4 * sigma, mean + 4 * sigma)
+		bpl.add_labels(data_label, "Number")
+
+		# If the user wants to, save the figure.
+		if savename is not None:
+			plt.savefig(savename, format=savename[-3:])
 
 	# return only the params that matter, since the amplitude is determined
 	# by our choice of binning.

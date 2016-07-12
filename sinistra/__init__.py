@@ -1,4 +1,4 @@
-import utilities
-import astropy_helpers
-import phot
-import classes
+from . import utilities
+from . import astropy_helpers
+from . import phot
+from . import classes

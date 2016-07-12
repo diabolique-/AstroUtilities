@@ -6,7 +6,7 @@ from astropy import wcs
 import os
 import numpy as np
 
-import utilities
+from . import utilities
 
 
 def symmetric_match(table_1, table_2, ra_col_1="ra", ra_col_2="ra",
