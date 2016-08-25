@@ -5,136 +5,148 @@ import os
 from . import utilities
 
 def aperture_grid(image, spacing, output=False, clobber=False):
-	"""
-	Makes a grid of apertures and writes to a qphot-compatible coords file.
+    """
+    Makes a grid of apertures and writes to a qphot-compatible coords file.
 
-	:param image: location of the image to be used.
-	:type image: str
-	:param spacing: x and y spacing between locations. For example, if one
-	                aperture is located at x, the next is x + spacing. The
-	                same thing holds for the y direction.
-	:param spacing: float
-	:param output: Either False, or the name of the coordinates file 
-	                    that the output will be written to. If you don't want 
-	                    to write to a file, pass in False.
-	:type output: bool / str
-	:param clobber: Whether or not to check for an already existing file of
-	                this name. If it already exists, it will raise an error.
-	:returns: List of tuples that contain the x,y coordinates of each
-	          aperture.
-	"""
-	if output and not clobber:
-		if utilities.check_if_file(output):
-			raise IOError("The coords file {} already exists. "
-				          " Set clobber = True if you're okay with "
-				          "overwriting this.")
-	# if everything is fine, it will continue on.
+    :param image: location of the image to be used.
+    :type image: str
+    :param spacing: x and y spacing between locations. For example, if one
+                    aperture is located at x, the next is x + spacing. The
+                    same thing holds for the y direction.
+    :param spacing: float
+    :param output: Either False, or the name of the coordinates file 
+                        that the output will be written to. If you don't want 
+                        to write to a file, pass in False.
+    :type output: bool / str
+    :param clobber: Whether or not to check for an already existing file of
+                    this name. If it already exists, it will raise an error.
+    :returns: List of tuples that contain the x,y coordinates of each
+              aperture.
+    """
+    if output and not clobber:
+        if utilities.check_if_file(output):
+            raise IOError("The coords file {} already exists. "
+                          " Set clobber = True if you're okay with "
+                          "overwriting this.")
+    # if everything is fine, it will continue on.
 
-	# get the size of the image from the header
-	header = fits.getheader(image)
-	x_max = header["NAXIS1"]
-	y_max = header["NAXIS2"]
+    # get the size of the image from the header
+    header = fits.getheader(image)
+    x_max = header["NAXIS1"]
+    y_max = header["NAXIS2"]
 
-	# then find all the places apertures can go. The first one is spaced half
-	# a spacing from the edge, so that if aperture_size = spacing, then the 
-	# aperture would go to the edge of the image.
-	xs = np.arange(spacing / 2.0, x_max, spacing)
-	ys = np.arange(spacing / 2.0, y_max, spacing)
+    # then find all the places apertures can go. The first one is spaced half
+    # a spacing from the edge, so that if aperture_size = spacing, then the 
+    # aperture would go to the edge of the image.
+    xs = np.arange(spacing / 2.0, x_max, spacing)
+    ys = np.arange(spacing / 2.0, y_max, spacing)
 
- 	# Then turn these into ordered pairs.
- 	ordered_pairs = []
-	for x in xs:
-		for y in ys:
-			ordered_pairs.append((x, y))
+    # Then turn these into ordered pairs.
+    ordered_pairs = []
+    for x in xs:
+        for y in ys:
+            ordered_pairs.append((x, y))
 
-	# then if the user wants to, write to the file
-	if output:
-		with open(output, "w") as output_file:
-			for pair in ordered_pairs:
-				x, y = pair
-				output_file.write("{} {}\n".format(x, y))
+    # then if the user wants to, write to the file
+    if output:
+        with open(output, "w") as output_file:
+            for pair in ordered_pairs:
+                x, y = pair
+                output_file.write("{} {}\n".format(x, y))
 
-	# no matter what, return the ordered pairs
-	return ordered_pairs
-
-
-def fit_gaussian_negative(data, upper_cutoff, plot=False, savename=None,
-	                      data_label="Counts"):
-	"""
-	Fits a Gaussain to all data underneath some cutoff.
-
-	This is useful when doing things where the lower side of a Gaussian tells
-	about the intrinsic scatter of something, whereas the upper end is 
-	contaminated by real objects. An example is the flux within many 
-	randomly placed apertures. The lower side will tell the sky error in the
-	aperture flux.
-
-	:param data: list of data to be fitted.
-	:type data: list, np.array
-	:param upper_cutoff: Data below this number will be used to fit the 
-	                     Gaussian, while data above this will be rejected.
-	:type upper_cutoff: float
-	:param plot: Whether or not to create a plot showing the best fit to the
-	             histogram of the data.
-	:type plot: bool
-	:param savename: If you are creating a plot, enter a file path here to save
-	                 the figure. If this is left as none, then the plot will 
-	                 not be saved. If you are running in an Jupyter notebook,
-	                 the figure will show up even if it is not saved, so it's 
-	                 not essential.
-	:type savename: str
-	:param data_label: Descriptor of the data that will be used on the x-axis
-	                   of the data histogram. Defaults to "Flux" unless 
-	                   otherwise specified.
-	:type data_label: str
-	:return: the mean and sigma of the best fit Gaussian.
-	"""
-	from scipy.optimize import curve_fit
-
-	good_data = [item for item in data if item < upper_cutoff]
-
-	# make the bins that will be used to fit things
-	bins = np.linspace(min(data), upper_cutoff, 250)
+    # no matter what, return the ordered pairs
+    return ordered_pairs
 
 
-	bin_values, bin_edges = np.histogram(good_data, bins=bins)
+def fit_gaussian_negative(data, upper_cutoff, bin_size=None, plot=False, 
+                          savename=None, data_label="Counts"):
+    """
+    Fits a Gaussain to all data underneath some cutoff.
 
-	# turn the edges into centers of the bins
-	bin_centers = []
-	for i in range(len(bin_edges) - 1):  # iterate through all left edges
-		# then take the average of the left and right edges.
-		center = np.mean([bin_edges[i], bin_edges[i+1]])
-		bin_centers.append(center)
+    This is useful when doing things where the lower side of a Gaussian tells
+    about the intrinsic scatter of something, whereas the upper end is 
+    contaminated by real objects. An example is the flux within many 
+    randomly placed apertures. The lower side will tell the sky error in the
+    aperture flux.
 
-	# we can then fit the gaussian using Scipy.
-	params, uncertainty = curve_fit(utilities.gaussian, xdata=bin_centers,
-	                                ydata=bin_values)
-	# we know what the params are, so find them.
-	mean, sigma, amplitude = params
-	# get rid of any sign on sigma, which sometimes happens
-	sigma = abs(sigma)
+    :param data: list of data to be fitted.
+    :type data: list, np.array
+    :param upper_cutoff: Data below this number will be used to fit the 
+                         Gaussian, while data above this will be rejected.
+    :type upper_cutoff: float
+    :param bin_size: size of bins used to fit the histogram. If not specified, 
+                     the code will make its own.
+    :type bin_size: float
+    :param plot: Whether or not to create a plot showing the best fit to the
+                 histogram of the data.
+    :type plot: bool
+    :param savename: If you are creating a plot, enter a file path here to save
+                     the figure. If this is left as none, then the plot will 
+                     not be saved. If you are running in an Jupyter notebook,
+                     the figure will show up even if it is not saved, so it's 
+                     not essential.
+    :type savename: str
+    :param data_label: Descriptor of the data that will be used on the x-axis
+                       of the data histogram. Defaults to "Flux" unless 
+                       otherwise specified.
+    :type data_label: str
+    :return: the mean and sigma of the best fit Gaussian.
+    """
+    from scipy.optimize import curve_fit
 
-	# now we need to plot the histogram if the user wants. 
-	if plot:
-		# import the things needed to plot
-		import betterplotlib as bpl
-		import matplotlib.pyplot as plt
-		bpl.default_style()
+    good_data = [item for item in data if item < upper_cutoff]
+  
+    #make the bins that will be used to fit things
+    if bin_size is None:
+        bins = np.linspace(min(data), upper_cutoff, 250)
+    else:
+        bins = [upper_cutoff]
+        while bins[0] > min(data):
+            bins.insert(0, bins[0] - bin_size)
 
-		fig, ax = plt.subplots()
-		# set the new bounds for the histogram. We want to reuse the old bounds
-		# on the left side, plus make an equally spaced one on the upper side
-		lower_lim = min(data)
-		# the upper boundary goes the same distance as the lower boundary 
-		# from the upper_cutoff, which will be the center of the plot
-		upper_lim  = upper_cutoff + (upper_cutoff - min(data))
+    bin_values, bin_edges = np.histogram(good_data, bins=bins)
 
-		# then turn this into bins.
-		bins = np.linspace(lower_lim, upper_lim, 500)
+    # turn the edges into centers of the bins
+    bin_centers = []
+    for i in range(len(bin_edges) - 1):  # iterate through all left edges
+        # then take the average of the left and right edges.
+        center = np.mean([bin_edges[i], bin_edges[i+1]])
+        bin_centers.append(center)
+
+    # we can then fit the gaussian using Scipy.
+    params, uncertainty = curve_fit(utilities.gaussian, xdata=bin_centers,
+                                    ydata=bin_values)
+    # we know what the params are, so find them.
+    mean, sigma, amplitude = params
+    # get rid of any sign on sigma, which sometimes happens
+    sigma = abs(sigma)
+
+    # now we need to plot the histogram if the user wants. 
+    if plot:
+        # import the things needed to plot
+        import betterplotlib as bpl
+        import matplotlib.pyplot as plt
+        bpl.default_style()
+
+        fig, ax = plt.subplots()
+        if bin_size is None:
+            # set the new bounds for the histogram. We want to reuse the old bounds
+            # on the left side, plus make an equally spaced one on the upper side
+            lower_lim = min(data)
+            # the upper boundary goes the same distance as the lower boundary 
+            # from the upper_cutoff, which will be the center of the plot
+            upper_lim  = upper_cutoff + (upper_cutoff - min(data))
+
+            # then turn this into bins.
+            bins = np.linspace(lower_lim, upper_lim, 500)
+        else:
+            bins = [min(data)]
+            while bins[-1] < max(data):
+                bins.append(bins[-1] + bin_size)
         bpl.hist(data, bins=bins, label="Data")
         
         # Then get the overplotted gaussian
-        xs = np.linspace(lower_lim, upper_lim, 5000)
+        xs = np.linspace(min(bins), max(bins), 5000)
         ys = utilities.gaussian(xs, mean, sigma, amplitude)
         plt.plot(xs, ys, c=bpl.almost_black, lw=3, label="Best fit")
 
@@ -145,11 +157,11 @@ def fit_gaussian_negative(data, upper_cutoff, plot=False, savename=None,
 
         # If the user wants to, save the figure.
         if savename is not None:
-        	plt.savefig(savename, format=savename[-3:])
+            plt.savefig(savename, format=savename[-3:])
 
-	# return only the params that matter, since the amplitude is determined
-	# by our choice of binning.
-	return mean, sigma
+    # return only the params that matter, since the amplitude is determined
+    # by our choice of binning.
+    return mean, sigma
 
 # def ap_phot(center_row_idx, center_col_idx, image_data, aperture_radius):
 # 	"""

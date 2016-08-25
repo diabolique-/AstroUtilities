@@ -3,19 +3,21 @@
 import numpy as np
 import os
 
-def reduced_chi_sq(model, data, errors):
+def reduced_chi_sq(model, data, errors, num_parameters):
     """ Does a reduced chi squared calculation
 
     .. math::
         \\chi^2 = \\sum_{k=1}^{n} \\left( \\frac{\\text{model}_k - \\text{data}_k}{\\text{error}_k} \\right) ^2
 
-        \\chi^2_{\\text{red}} = \\frac{\\chi^2}{n}
+        \\chi^2_{\\text{red}} = \\frac{\\chi^2}{n - n_param - 1}
 
     where :math:`n` is the number of data points.
 
     :param model: list of values that describe a possible fit to the data
     :param data: list of values that are the data do be fitted
     :param errors: list of errors on the data
+    :param num_parameters: Number of tunable pararamters in the model. This is
+                           required for the reduced chi-squared calculation.
     :return: value for the reduced chi squared value of the fit of the model to the data
     """
     if not len(model) == len(data) == len(errors):
@@ -23,7 +25,7 @@ def reduced_chi_sq(model, data, errors):
     chi_sq = 0
     for i in range(len(model)):
         chi_sq += ((model[i] - data[i])/errors[i])**2
-    return chi_sq/(len(data))
+    return chi_sq/(len(data) - num_parameters - 1)
 
 def mag_to_flux(mag, zeropoint):
     """Convert a magnitude into a flux.
@@ -45,7 +47,7 @@ def mag_to_flux(mag, zeropoint):
     return 10**((zeropoint - mag)/2.5)
 
 
-def flux_to_mag(flux, zeropoint):
+def flux_to_mag(flux, zeropoint, bad_data=-99):
     """Convert flux to magnitude with the given zeropoint.
 
     .. math::
@@ -53,14 +55,15 @@ def flux_to_mag(flux, zeropoint):
 
     :param flux: flux in whatever units. Choose your zeropoint correctly to make this work with the units flux is in.
     :param zeropoint: zeropoint of the system (in mags)
+    :param bad_data: Value to give data with negative flux. Defaults to -99.
     :return: magnitude that corresponds to the given flux
     """
 
     import numpy as np
-    try:
+    if flux > 0:
         return -2.5 * np.log10(flux) + zeropoint  # This is just the definition of magnitude
-    except ValueError:  # the flux might be negative, and will mess things up
-        return np.nan
+    else:
+        return bad_data
 
 
 def mag_errors_to_percent_flux_errors(mag_error):
@@ -253,7 +256,14 @@ def flux_conv(flux_zeropont, counts_zeropoint):
 vega_to_ab_conversions = {"w1": 2.683,
                           "w2": 3.319,
                           "w3": 5.242,
-                          "w4": 6.604}
+                          "w4": 6.604,
+                          "ch1": 2.787,
+                          "ch2": 3.260,
+                          "sloan_u": 0.904,
+                          "sloan_g": -0.098,
+                          "sloan_r": 0.146,
+                          "sloan_i": 0.357,
+                          "sloan_z": 0.521}
 
 def vega_to_ab(vega_mag, band):
     """
@@ -274,7 +284,7 @@ def vega_to_ab(vega_mag, band):
         return vega_mag + vega_to_ab_conversions[band]
     except KeyError:
         print("{} has not yet been implemented. Find the conversion "
-              "and add it, please. ")
+              "and add it, please. ".format(band))
 
 def ab_to_vega(ab_mag, band):
     """
@@ -296,7 +306,7 @@ def ab_to_vega(ab_mag, band):
         return ab_mag - vega_to_ab_conversions[band]
     except KeyError:
         print("{} has not yet been implemented. Find the conversion "
-              "and add it, please. ")
+              "and add it, please. ".format(band))
 
 # Note: these all need to be tested.
 
