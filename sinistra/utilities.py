@@ -59,7 +59,6 @@ def flux_to_mag(flux, zeropoint, bad_data=-99):
     :return: magnitude that corresponds to the given flux
     """
 
-    import numpy as np
     if flux > 0:
         return -2.5 * np.log10(flux) + zeropoint  # This is just the definition of magnitude
     else:
