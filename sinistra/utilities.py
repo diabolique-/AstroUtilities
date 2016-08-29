@@ -22,10 +22,16 @@ def reduced_chi_sq(model, data, errors, num_parameters):
     """
     if not len(model) == len(data) == len(errors):
         raise ValueError("The length of the model, data, and errors need to be the same.")
-    chi_sq = 0
-    for i in range(len(model)):
-        chi_sq += ((model[i] - data[i])/errors[i])**2
-    return chi_sq/(len(data) - num_parameters - 1)
+
+    # convert to numpy arrays to vectorize computation
+    model = np.array(model)
+    data = np.array(data)
+    errors = np.array(errors)
+
+    chi_squared_values = ((model - data)/errors) ** 2
+    chi_squared = sum(chi_squared_values)
+    
+    return chi_squared/(len(data) - num_parameters - 1)
 
 def mag_to_flux(mag, zeropoint):
     """Convert a magnitude into a flux.
