@@ -5,6 +5,7 @@ import os
 from . import utilities
 
 def aperture_grid(image, spacing, output=False, clobber=False):
+<<<<<<< HEAD
 	"""
 	Makes a grid of apertures and writes to a qphot-compatible coords file.
 
@@ -147,9 +148,9 @@ def fit_gaussian_negative(data, upper_cutoff, plot=False, savename=None,
 		if savename is not None:
 			plt.savefig(savename, format=savename[-3:])
 
-	# return only the params that matter, since the amplitude is determined
-	# by our choice of binning.
-	return mean, sigma
+    # return only the params that matter, since the amplitude is determined
+    # by our choice of binning.
+    return mean, sigma
 
 # def ap_phot(center_row_idx, center_col_idx, image_data, aperture_radius):
 # 	"""
