@@ -297,7 +297,8 @@ def pretty_write(table, out_file, clobber=False):
         
         # then write all the data
         for line in table:
-            output.write(formatting.format(*line))
+            out_line = [str(item) for item in line]
+            output.write(formatting.format(*out_line))
         
 
 def wcs_to_xy(ra, dec, image_path):
