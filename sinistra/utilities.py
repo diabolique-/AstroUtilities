@@ -178,7 +178,7 @@ def gaussian(x, mean, sigma, amplitude):
 
     """
 
-    return amplitude * np.e ** (-1 * ((x - mean)**2 / (2 * sigma**2)))
+    return amplitude * np.e ** (-1 * ((x - mean) / (np.sqrt(2) * sigma))**2)
 
 def normed_gaussian(x, mean, sigma):
     """
@@ -204,7 +204,7 @@ def normed_gaussian(x, mean, sigma):
 
     # first see if amplitude is defined, and if not, normalize it.
     amplitude = 1.0 / (sigma * np.sqrt(2 * np.pi))
-    return amplitude * np.e ** (-1 * ((x - mean)**2 / (2 * sigma**2)))
+    return amplitude * np.e ** (-1 * ((x - mean) / (np.sqrt(2) * sigma))**2)
 
 def flux_conv(flux_zeropont, counts_zeropoint):
     """
